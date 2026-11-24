@@ -1,0 +1,20 @@
+---
+import { getCollection, render } from 'astro:content';
+import Split from '../../layouts/Split.astro';
+
+// Only jobs with text below their frontmatter get a page.
+export async function getStaticPaths() {
+  const jobs = await getCollection('experience', (job) => Boolean(job.body?.trim()));
+  return jobs.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Split title={entry.data.role} heading={entry.data.role} caption={entry.data.place} scene={entry.data.scene}>
+  <a class="back" href={`${base}/#experience`} data-back>Back to experience <kbd>esc</kbd></a>
+  <p class="tags"><span>{entry.data.years}</span></p>
+  <article class="md"><Content /></article>
+</Split>

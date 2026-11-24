@@ -1,0 +1,313 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #fbfbfa;
+  --fg: #1b1b1b;
+  --mid: #6b6b6b;
+  --line: #e3e3df;
+  --code: #f1f1ee;
+  --accent: #2a4bd7;
+  --tint: #0a7d62;
+  --sans: "Geist", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+}
+:root[data-theme="dark"] {
+  --bg: #14161b;
+  --fg: #e6e8ec;
+  --mid: #8b919c;
+  --line: #262a32;
+  --code: #1a1d23;
+  --accent: #8fb4ff;
+  --tint: #7fe0c3;
+}
+:root[data-theme="vesper"] {
+  --bg: #101010;
+  --fg: #ffffff;
+  --mid: #a0a0a0;
+  --line: #282828;
+  --code: #161616;
+  --accent: #ffc799;
+  --tint: #99ffe4;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+kbd {
+  font: 11px var(--mono);
+  color: var(--mid);
+}
+
+/* The two halves. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+}
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+}
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated; /* keeps each dot a sharp square when the canvas is scaled up */
+}
+.plate {
+  position: absolute;
+  left: 28px;
+  bottom: 28px;
+  max-width: calc(100% - 56px);
+  padding: 14px 18px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.face {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  opacity: 1;
+}
+.plate h1 {
+  margin: 0;
+  font: 600 22px/1.2 var(--sans);
+  letter-spacing: -0.02em;
+}
+.plate p {
+  margin: 4px 0 0;
+  font: 12px var(--mono);
+  color: var(--mid);
+}
+.flow {
+  max-width: 700px;
+  padding: 72px 56px 120px;
+}
+.flow > h2 {
+  margin: 56px 0 10px;
+  font: 500 13px var(--mono);
+  color: var(--accent);
+  scroll-margin-top: 24px;
+}
+
+/* The larger opening line. On the home page it is the first paragraph of about.md. */
+.lede,
+.intro > p:first-child {
+  max-width: 34ch;
+  margin: 0 0 14px;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+/* Lists of projects and jobs. */
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.rows li {
+  border-bottom: 1px solid var(--line);
+}
+.row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 0;
+  text-decoration: none;
+}
+.roles .row {
+  grid-template-columns: 1fr 1fr auto;
+}
+.row .t {
+  font-weight: 500;
+}
+.row .b {
+  color: var(--mid);
+}
+.row .y {
+  font: 12px var(--mono);
+  color: var(--mid);
+}
+a.row:hover .t {
+  color: var(--accent);
+}
+
+/* Project and job pages. */
+.back {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 28px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: 12px var(--mono);
+  color: var(--mid);
+  text-decoration: none;
+}
+.back:hover {
+  color: var(--fg);
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 22px;
+}
+.tags span {
+  padding: 1px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font: 12px var(--mono);
+  color: var(--mid);
+}
+.next {
+  display: grid;
+  gap: 2px;
+  margin-top: 48px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  text-decoration: none;
+}
+.next span {
+  font: 12px var(--mono);
+  color: var(--mid);
+}
+.next b {
+  font: 500 17px var(--sans);
+}
+.next em {
+  font-style: normal;
+  color: var(--mid);
+}
+.next:hover b {
+  color: var(--accent);
+}
+
+/* Everything that comes out of a markdown file. */
+.md h2 {
+  margin: 32px 0 8px;
+  font: 500 13px var(--mono);
+  color: var(--accent);
+}
+.md h2::before {
+  content: "## ";
+  color: var(--mid);
+}
+.md p,
+.md li {
+  max-width: 64ch;
+}
+.md p {
+  margin: 0 0 14px;
+}
+.md ul {
+  margin: 0 0 14px;
+  padding-left: 18px;
+}
+.md a {
+  color: var(--accent);
+}
+.md code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--code);
+  font: 13px var(--mono);
+  color: var(--tint);
+}
+.md pre {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  overflow: auto;
+  background: var(--code);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.md pre code {
+  padding: 0;
+  background: none;
+  color: var(--fg);
+}
+.md table {
+  margin: 0 0 16px;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.md th,
+.md td {
+  padding: 6px 20px 6px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.md th {
+  font-weight: 500;
+  color: var(--mid);
+}
+
+/* The theme button. */
+.theme {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  padding: 6px 12px;
+  background: var(--code);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font: 12px var(--mono);
+  color: var(--mid);
+  cursor: pointer;
+}
+.theme:hover {
+  color: var(--fg);
+}
+
+/* Phones: the scene becomes a band across the top. */
+@media (max-width: 760px) {
+  .split {
+    display: block;
+  }
+  .stage {
+    position: relative;
+    height: 42vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .plate {
+    left: 16px;
+    bottom: 16px;
+    max-width: calc(100% - 32px);
+  }
+  .flow {
+    padding: 32px 16px 96px;
+  }
+  .row,
+  .roles .row {
+    grid-template-columns: 1fr auto;
+  }
+  .row .b {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

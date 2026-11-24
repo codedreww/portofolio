@@ -1,0 +1,107 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+
+interface Props {
+  title: string;   // shown in the browser tab
+  heading: string; // the large text on the plate over the scene
+  caption: string; // the small text under it
+  scene: string;   // which scene from dither.ts to draw
+}
+const { title, heading, caption, scene } = Astro.props;
+
+// Works whether the site lives at the root of a domain or in a sub-folder.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === 'Andrew Tan' ? title : `${title} | Andrew Tan`}</title>
+    <meta name="description" content="Andrew Tan, software developer. Projects and experience." />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      // Applies the saved theme before the page is drawn, so it never flashes the wrong colours.
+      function applyTheme() {
+        let theme = 'vesper'; // the theme a first-time visitor sees
+        try {
+          theme = localStorage.getItem('theme') || theme;
+        } catch {}
+        document.documentElement.dataset.theme = theme;
+      }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
+    </script>
+    <ClientRouter />
+  </head>
+  <body>
+    <div class="split">
+      <div class="stage" transition:name="stage" transition:animate="fade">
+        <canvas id="scene" data-scene={scene} aria-hidden="true"></canvas>
+        <div class="plate">
+          <!-- The same drawing as public/favicon.svg, coloured by the theme. -->
+          <svg class="face" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 61C13.5 48 21 31 27.5 23.5Q29.5 21 32.5 20L40.5 17.2Q45.2 16 46.8 20.5C49.8 33 53 48 55.5 61" />
+            <path d="M17 25.5L12.6 15.2L20.6 17.6L23.4 9.6L29.4 13.4L33.4 5.6L31.8 20.4Z" fill="currentColor" />
+            <circle cx="31.4" cy="29" r="1.9" fill="currentColor" stroke="none" />
+            <circle cx="42.8" cy="26.4" r="1.9" fill="currentColor" stroke="none" />
+            <path d="M34 36.6L42.6 35.4" />
+          </svg>
+          <div>
+            <h1>{heading}</h1>
+            <p>{caption}</p>
+          </div>
+        </div>
+      </div>
+      <main class="flow" transition:animate="slide">
+        <slot />
+      </main>
+    </div>
+
+    <button class="theme" type="button" data-theme-button aria-label="Change theme"></button>
+
+    <script>
+      import { startScene } from '../scripts/dither';
+
+      const themes = ['vesper', 'dark', 'light'];
+
+      // Shows the current theme's name on the button.
+      function labelThemeButton() {
+        const button = document.querySelector('[data-theme-button]');
+        if (button) button.textContent = document.documentElement.dataset.theme ?? '';
+      }
+
+      // Each click moves to the next theme in the list.
+      document.addEventListener('click', (event) => {
+        if (!(event.target as HTMLElement).closest('[data-theme-button]')) return;
+        const current = document.documentElement.dataset.theme ?? themes[0];
+        const next = themes[(themes.indexOf(current) + 1) % themes.length];
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('theme', next);
+        } catch {}
+        labelThemeButton();
+        startScene();
+      });
+
+      // Esc follows the "Back" link, on pages that have one.
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') document.querySelector<HTMLAnchorElement>('a[data-back]')?.click();
+      });
+
+      // Runs on the first load and again after every change of page.
+      document.addEventListener('astro:page-load', () => {
+        labelThemeButton();
+        startScene();
+      });
+    </script>
+  </body>
+</html>
